@@ -5,11 +5,19 @@
 
 body {
     height: 90vh;
-    background-color: rgb(30, 30, 35);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+#color-theme {
+    position: absolute;
+    left: 2em;
+    top: 2em;
+    width: 3em;
+    height: 3em;
+    cursor: pointer;
 }
 
 #calculator-body {
@@ -49,14 +57,12 @@ body {
 
 /* hover - это состояние элемента, когда на него наведен курсор */
 .my-btn:hover {
-    background: #e0796b;
-    /* при наведение курсора на кнопку, она будет окрашена в серый */
+    filter: brightness(90%);
 }
 
 /* active - это состояние активации элемента. В случае кнопки - нажатие на нее */
 .my-btn:active {
-    filter: brightness(130%);
-    /* увеличим интенсивность цвета для эффекта вспышки */
+    filter: brightness(80%);
 }
 
 /* селектор для кнопок первостепенных операций */
@@ -80,8 +86,8 @@ body {
 }
 
 /* селектор для поля вывода результата */
-.result {
-    width: 220px;
+#result {
+    width: 280px;
     height: 70px;
     border-radius: 0.2em;
     margin-bottom: 15px;
@@ -100,6 +106,6 @@ body {
 }
 
 #author {
-    color: white;
+    color: black;
     margin-top: 5em;
 }
