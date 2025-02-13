@@ -3,6 +3,19 @@ let b = '';
 let expressionResult = '';
 let selectedOperation = null;
 let colorTheme = 'light';
+let clearOnDigit = false;
+
+// обработка нажатия на функциональную кнопку после "=" или другой функции без "="
+const handleOperationChain = function () {
+    if (clearOnDigit) {
+        clearOnDigit = false;
+        b = '';
+    } else if (a && b) {
+        calculateResult();
+        clearOnDigit = false;
+        b = '';
+    }
+}
 
 // окно вывода результата
 const outputElement = document.getElementById('result');
@@ -11,6 +24,12 @@ const outputElement = document.getElementById('result');
 const digitButtons = document.querySelectorAll('[id ^= "btn_digit_"]');
 
 function onDigitButtonClicked(digit) {
+    if (digit.length != 1 || !'0123456789.'.includes(digit))
+        return;
+    if (clearOnDigit) {
+        clearState();
+        clearOnDigit = false;
+    }
     if (!selectedOperation) {
         if ((digit != '.') || (digit == '.' && !a.includes(digit))) {
             a += digit;
@@ -32,67 +51,83 @@ digitButtons.forEach(button => {
     }
 });
 
+// ввод цифр и точки с помощью клавиатуры
+document.onkeydown = function (e) {
+    onDigitButtonClicked(e.key);
+}
+
+// обёртка для функций-обработчиков функциональных кнопок
+const handleFuncBtn = function (callback) {
+    if (a === '') return;
+    handleOperationChain();
+    callback();
+    outputElement.innerHTML = a;
+}
+
 // установка колбек-функций для кнопок операций
 document.getElementById('btn_op_sign').onclick = function () {
-    if (a === '') return;
-    a = (-a).toString();
-    outputElement.innerHTML = a;
+    handleFuncBtn(() => {
+        a = (-a).toString();
+    });
 }
 document.getElementById('btn_op_percent').onclick = function () {
-    if (a === '') return;
-    a = (+a * 0.01).toString();
-    outputElement.innerHTML = a;
+    handleFuncBtn(() => {
+        a = (+a * 0.01).toString();
+    });
 }
 document.getElementById('btn_op_back').onclick = function () {
-    if (a === '') return;
-    a = a.slice(0, -1);
-    if (a === '')
-        a = '0';
-    outputElement.innerHTML = a;
+    handleFuncBtn(() => {
+        a = a.slice(0, -1);
+        if (a === '')
+            a = '0';
+    });
 }
 document.getElementById('btn_op_sqrt').onclick = function () {
-    if (a === '') return;
-    a = Math.sqrt(a).toString();
-    outputElement.innerHTML = a;
+    handleFuncBtn(() => {
+        a = Math.sqrt(a).toString();
+    });
 }
 document.getElementById('btn_op_2grade').onclick = function () {
-    if (a === '') return;
-    a = (a ** 2).toString();
-    outputElement.innerHTML = a;
+    handleFuncBtn(() => {
+        a = (a ** 2).toString();
+    });
 }
 document.getElementById('btn_op_factorial').onclick = function () {
-    if (a === '') return;
-    let rval = 1;
-    for (let i = 2; i <= a; i++)
-        rval = rval * i;
-    a = rval.toString();
-    outputElement.innerHTML = a;
+    handleFuncBtn(() => {
+        let rval = 1;
+        for (let i = 2; i <= a; i++)
+            rval = rval * i;
+        a = rval.toString();
+    });
 }
 document.getElementById('btn_op_addthousand').onclick = function () {
-    if (a === '') return;
-    a = (a * 1000).toString();
-    outputElement.innerHTML = a;
+    handleFuncBtn(() => {
+        a = (a * 1000).toString();
+    });
 }
 
 document.getElementById('btn_op_mult').onclick = function () {
-    if (a === '') return;
-    selectedOperation = 'x';
+    handleFuncBtn(() => {
+        selectedOperation = 'x';
+    });
 }
 document.getElementById('btn_op_plus').onclick = function () {
-    if (a === '') return;
-    selectedOperation = '+';
+    handleFuncBtn(() => {
+        selectedOperation = '+';
+    });
 }
 document.getElementById('btn_op_minus').onclick = function () {
-    if (a === '') return;
-    selectedOperation = '-';
+    handleFuncBtn(() => {
+        selectedOperation = '-';
+    });
 }
 document.getElementById('btn_op_div').onclick = function () {
-    if (a === '') return;
-    selectedOperation = '/';
+    handleFuncBtn(() => {
+        selectedOperation = '/';
+    });
 }
 
-// кнопка очищения
-document.getElementById('btn_op_clear').onclick = function () {
+const clearState = function () {
     a = '';
     b = '';
     selectedOperation = null;
@@ -100,8 +135,10 @@ document.getElementById('btn_op_clear').onclick = function () {
     outputElement.innerHTML = '0';
 }
 
-// кнопка расчёта результата
-document.getElementById('btn_op_equal').onclick = function () {
+// кнопка очищения
+document.getElementById('btn_op_clear').onclick = clearState;
+
+const calculateResult = function () {
     if (a === '' || b === '' || !selectedOperation)
         return;
 
@@ -122,18 +159,20 @@ document.getElementById('btn_op_equal').onclick = function () {
 
     a = expressionResult.toString();
     outputElement.innerHTML = a;
+    clearOnDigit = true;
 }
+
+// кнопка расчёта результата
+document.getElementById('btn_op_equal').onclick = calculateResult;
 
 document.getElementById('color-theme').onclick = function () {
     if (colorTheme === 'light') {
-        document.body.style.backgroundColor = 'rgb(30, 30, 35)';
+        document.body.style.backgroundColor = 'var(--color-darkest)';
         document.getElementById('color-theme').style.filter = 'invert(1)';
-        document.getElementById('author').style.filter = 'invert(1)';
         colorTheme = 'dark';
     } else if (colorTheme === 'dark') {
-        document.body.style.backgroundColor = 'rgb(225, 225, 220)';
+        document.body.style.backgroundColor = 'var(--color-light)';
         document.getElementById('color-theme').style.filter = '';
-        document.getElementById('author').style.filter = '';
         colorTheme = 'light';
     }
 }
