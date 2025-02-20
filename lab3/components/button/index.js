@@ -4,7 +4,7 @@ export class ButtonComponent {
     }
 
     getHTML(data) {
-        return `<button class="btn btn-primary" id="click-card-${data.id}" data-id="${data.id}">Нажми на меня</button>`;
+        return `<button class="btn btn-primary" id="click-card-${data.id}" data-id="${data.id}">${data.label}</button>`;
     }
 
     addListeners(data, listener) {
