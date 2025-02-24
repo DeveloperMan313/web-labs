@@ -1,9 +1,26 @@
+const MAX_LENGTH = 20;
+const MAX_DECIMAL_VALUE = 1000000;
+
 let a = '';
 let b = '';
 let expressionResult = '';
 let selectedOperation = null;
 let colorTheme = 'light';
 let clearOnDigit = false;
+
+// преобразование значения в верный формат строки
+const getValueString = function (str) {
+    let value = +str;
+    if (value > MAX_DECIMAL_VALUE) {
+        str = value.toExponential();
+    }
+    return str;
+}
+
+// отрисовка числа на экране калькулятора
+const renderValueString = function (str) {
+    resultElement.innerHTML = getValueString(str);
+}
 
 // обработка нажатия на функциональную кнопку после "=" или другой функции без "="
 const handleOperationChain = function () {
@@ -18,7 +35,9 @@ const handleOperationChain = function () {
 }
 
 // окно вывода результата
-const outputElement = document.getElementById('result');
+const resultElement = document.getElementById('result');
+// окно вывода последней операции
+const historyElement = document.getElementById('history');
 
 // список объектов кнопок циферблата (id которых начинается с btn_digit_)
 const digitButtons = document.querySelectorAll('[id ^= "btn_digit_"]');
@@ -31,14 +50,18 @@ function onDigitButtonClicked(digit) {
         clearOnDigit = false;
     }
     if (!selectedOperation) {
-        if ((digit != '.') || (digit == '.' && !a.includes(digit))) {
+        if (getValueString(a).length >= MAX_LENGTH) return;
+        if ((digit != '.' && digit != '0') || (digit == '.' && !a.includes(digit)) || (digit == '0' && a != '' && a != '0')) {
+            if (digit == '.' && a == '') a = '0';
             a += digit;
+            renderValueString(a);
         }
-        outputElement.innerHTML = a;
     } else {
-        if ((digit != '.') || (digit == '.' && !b.includes(digit))) {
+        if (getValueString(b).length >= MAX_LENGTH) return;
+        if ((digit != '.' && digit != '0') || (digit == '.' && !b.includes(digit)) || (digit == '0' && a != '' && a != '0')) {
+            if (digit == '.' && b == '') b = '0';
             b += digit;
-            outputElement.innerHTML = b;
+            renderValueString(b);
         }
     }
 }
@@ -61,7 +84,7 @@ const handleFuncBtn = function (callback) {
     if (a === '') return;
     handleOperationChain();
     callback();
-    outputElement.innerHTML = a;
+    renderValueString(a);
 }
 
 // установка колбек-функций для кнопок операций
@@ -102,7 +125,8 @@ document.getElementById('btn_op_factorial').onclick = function () {
 }
 document.getElementById('btn_op_addthousand').onclick = function () {
     handleFuncBtn(() => {
-        a = (a * 1000).toString();
+        if (a != '' && a != '0')
+            a += '000';
     });
 }
 
@@ -132,7 +156,8 @@ const clearState = function () {
     b = '';
     selectedOperation = null;
     expressionResult = '';
-    outputElement.innerHTML = '0';
+    renderValueString('0');
+    historyElement.innerHTML = '';
 }
 
 // кнопка очищения
@@ -157,8 +182,9 @@ const calculateResult = function () {
             break;
     }
 
+    historyElement.innerHTML = `${getValueString(a)} ${selectedOperation} ${getValueString(b)}`;
     a = expressionResult.toString();
-    outputElement.innerHTML = a;
+    renderValueString(a);
     clearOnDigit = true;
 }
 
