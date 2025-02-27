@@ -1,7 +1,7 @@
 const MAX_LENGTH = 20;
 const MAX_DECIMAL_VALUE = 1000000;
 
-let a = '';
+let a = '0';
 let b = '';
 let expressionResult = '';
 let selectedOperation = null;
@@ -51,14 +51,15 @@ function onDigitButtonClicked(digit) {
     }
     if (!selectedOperation) {
         if (getValueString(a).length >= MAX_LENGTH) return;
-        if ((digit != '.' && digit != '0') || (digit == '.' && !a.includes(digit)) || (digit == '0' && a != '' && a != '0')) {
-            if (digit == '.' && a == '') a = '0';
+        if ((digit != '.' && digit != '0') || (digit == '.' && !a.includes(digit)) || (digit == '0' && a != '0')) {
+            if (a == '0' && digit != '.')
+                a = '';
             a += digit;
             renderValueString(a);
         }
     } else {
         if (getValueString(b).length >= MAX_LENGTH) return;
-        if ((digit != '.' && digit != '0') || (digit == '.' && !b.includes(digit)) || (digit == '0' && a != '' && a != '0')) {
+        if ((digit != '.' && digit != '0') || (digit == '.' && !b.includes(digit)) || (digit == '0' && a != '0')) {
             if (digit == '.' && b == '') b = '0';
             b += digit;
             renderValueString(b);
@@ -81,7 +82,6 @@ document.onkeydown = function (e) {
 
 // обёртка для функций-обработчиков функциональных кнопок
 const handleFuncBtn = function (callback) {
-    if (a === '') return;
     handleOperationChain();
     callback();
     renderValueString(a);
@@ -135,9 +135,10 @@ document.getElementById('btn_op_factorial').onclick = function () {
 }
 document.getElementById('btn_op_addthousand').onclick = function () {
     handleFuncBtn(() => {
+        if (a == '0')
+            return;
         historyElement.innerHTML = `${getValueString(a)} * 1000`;
-        if (a != '' && a != '0')
-            a += '000';
+        a += '000';
     });
 }
 
@@ -163,7 +164,7 @@ document.getElementById('btn_op_div').onclick = function () {
 }
 
 const clearState = function () {
-    a = '';
+    a = '0';
     b = '';
     selectedOperation = null;
     expressionResult = '';
@@ -175,7 +176,7 @@ const clearState = function () {
 document.getElementById('btn_op_clear').onclick = clearState;
 
 const calculateResult = function () {
-    if (a === '' || b === '' || !selectedOperation)
+    if (b === '' || !selectedOperation)
         return;
 
     switch (selectedOperation) {
