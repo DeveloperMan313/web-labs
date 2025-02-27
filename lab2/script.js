@@ -90,16 +90,19 @@ const handleFuncBtn = function (callback) {
 // установка колбек-функций для кнопок операций
 document.getElementById('btn_op_sign').onclick = function () {
     handleFuncBtn(() => {
+        historyElement.innerHTML = `-(${getValueString(a)})`;
         a = (-a).toString();
     });
 }
 document.getElementById('btn_op_percent').onclick = function () {
     handleFuncBtn(() => {
+        historyElement.innerHTML = `${getValueString(a)}%`;
         a = (+a * 0.01).toString();
     });
 }
 document.getElementById('btn_op_back').onclick = function () {
     handleFuncBtn(() => {
+        historyElement.innerHTML = '';
         a = a.slice(0, -1);
         if (a === '')
             a = '0';
@@ -107,16 +110,23 @@ document.getElementById('btn_op_back').onclick = function () {
 }
 document.getElementById('btn_op_sqrt').onclick = function () {
     handleFuncBtn(() => {
+        if ((+a) < 0)
+            return;
+        historyElement.innerHTML = `√(${getValueString(a)})`;
         a = Math.sqrt(a).toString();
     });
 }
 document.getElementById('btn_op_2grade').onclick = function () {
     handleFuncBtn(() => {
+        historyElement.innerHTML = `(${getValueString(a)})^2`;
         a = (a ** 2).toString();
     });
 }
 document.getElementById('btn_op_factorial').onclick = function () {
     handleFuncBtn(() => {
+        if (a.includes('.') || (+a) < 0 || (+a) > 20)
+            return;
+        historyElement.innerHTML = `${getValueString(a)}!`;
         let rval = 1;
         for (let i = 2; i <= a; i++)
             rval = rval * i;
@@ -125,6 +135,7 @@ document.getElementById('btn_op_factorial').onclick = function () {
 }
 document.getElementById('btn_op_addthousand').onclick = function () {
     handleFuncBtn(() => {
+        historyElement.innerHTML = `${getValueString(a)} * 1000`;
         if (a != '' && a != '0')
             a += '000';
     });
