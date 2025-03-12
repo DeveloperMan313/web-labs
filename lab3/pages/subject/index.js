@@ -1,6 +1,7 @@
 import { BackButtonComponent } from '../../components/back-button/index.js';
+import { ButtonComponent } from '../../components/button/index.js';
 import { MainPage } from '../main/index.js';
-import { Carousel } from '../../components/carousel/index.js';
+import { ModulesPage } from '../modules/index.js';
 
 export class SubjectPage {
     constructor(parent) {
@@ -20,7 +21,14 @@ export class SubjectPage {
         mainPage.render();
     }
 
+    clickModules() {
+        const modulesPage = new ModulesPage(this.parent);
+        modulesPage.render(this.data);
+    }
+
     render(data) {
+        this.data = data;
+
         this.parent.innerHTML = '';
 
         const html = this.getHTML();
@@ -35,7 +43,7 @@ export class SubjectPage {
         `;
         this.pageRoot.insertAdjacentHTML('beforeend', textHtml);
 
-        const moduleCarousel = new Carousel(this.pageRoot);
-        moduleCarousel.render(data.modules);
+        const modulesButton = new ButtonComponent(this.pageRoot);
+        modulesButton.render({ id: 'modules-btn', label: 'Модули' }, this.clickModules.bind(this));
     }
 }

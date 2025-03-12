@@ -89,8 +89,8 @@ export class MainPage {
     clickCard(e) {
         const cardId = e.target.dataset.id;
         const subject = this.getData().filter((sub) => sub.id == cardId)[0];
-        const productPage = new SubjectPage(this.parent);
-        productPage.render(subject);
+        const subjectPage = new SubjectPage(this.parent);
+        subjectPage.render(subject);
     }
 
     render() {
